@@ -44,20 +44,27 @@ def download_via_kaggle_api(dest_dir: Path) -> bool:
     except Exception:
         pass
 
+    # Check if kaggle package is installed before importing to avoid static linter errors
     try:
-        from kaggle.api.kaggle_api_extended import KaggleApi
-        api = KaggleApi()
-        api.authenticate()
-        print(f"[KAGGLE API] Authenticated successfully. Downloading dataset: {config.KAGGLE_DATASET_ID}...")
-        
-        api.dataset_download_files(
-            dataset=config.KAGGLE_DATASET_ID,
-            path=str(dest_dir),
-            unzip=True,
-            quiet=False
-        )
-        print(f"[SUCCESS] Dataset downloaded and extracted to: {dest_dir}")
-        return True
+        import importlib
+        if importlib.util.find_spec("kaggle"):
+            kaggle_mod = importlib.import_module("kaggle.api.kaggle_api_extended")
+            KaggleApi = getattr(kaggle_mod, "KaggleApi")
+            api = KaggleApi()
+            api.authenticate()
+            print(f"[KAGGLE API] Authenticated successfully. Downloading dataset: {config.KAGGLE_DATASET_ID}...")
+            
+            api.dataset_download_files(
+                dataset=config.KAGGLE_DATASET_ID,
+                path=str(dest_dir),
+                unzip=True,
+                quiet=False
+            )
+            print(f"[SUCCESS] Dataset downloaded and extracted to: {dest_dir}")
+            return True
+        else:
+            print("[INFO] 'kaggle' Python package is not installed in the current environment.")
+            return False
     except Exception as e:
         print(f"[NOTICE] Kaggle API automated download could not be completed: {e}")
         return False
