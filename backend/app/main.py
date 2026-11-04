@@ -218,6 +218,17 @@ def get_performance_stats():
 
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("backend.app.main:app", host="127.0.0.1", port=8000, reload=True)
+    try:
+        import uvicorn  # type: ignore
+        uvicorn.run("backend.app.main:app", host="127.0.0.1", port=8000, reload=True)
+    except ImportError:
+        print(
+            "\n" + "=" * 70 + "\n"
+            "[ERROR] Uvicorn is not installed in the active Python environment!\n"
+            "To install all required backend packages, run:\n"
+            "    pip install -r backend/requirements.txt\n"
+            "Or run from terminal via:\n"
+            "    uvicorn backend.app.main:app --reload --port 8000\n"
+            "=" * 70
+        )
 
