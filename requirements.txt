@@ -24,3 +24,4 @@ kaggle>=1.5.16
 tqdm>=4.65.0
 jupyter>=1.0.0
 ipywidgets>=8.0.0
+

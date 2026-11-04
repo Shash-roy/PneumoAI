@@ -151,3 +151,4 @@ def load_checkpoint(
         
     print(f"[LOADED] Checkpoint loaded from {path} (Epoch: {checkpoint.get('epoch', 'N/A')}, Val AUC: {checkpoint.get('val_auc', 'N/A')})")
     return checkpoint
+

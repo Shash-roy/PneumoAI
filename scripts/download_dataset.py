@@ -30,14 +30,17 @@ def download_via_kaggle_api(dest_dir: Path) -> bool:
     dest_dir.mkdir(parents=True, exist_ok=True)
     
     # Check if in Google Colab and credentials are in Colab Secrets
+    # We use importlib to avoid static linter errors on local machines where google.colab is not installed
     try:
-        from google.colab import userdata
-        kaggle_username = userdata.get('KAGGLE_USERNAME')
-        kaggle_key = userdata.get('KAGGLE_KEY')
-        if kaggle_username and kaggle_key:
-            os.environ['KAGGLE_USERNAME'] = kaggle_username
-            os.environ['KAGGLE_KEY'] = kaggle_key
-            print("[COLAB] Authenticated using Colab Secrets.")
+        import importlib
+        if importlib.util.find_spec("google") and importlib.util.find_spec("google.colab"):
+            userdata = importlib.import_module("google.colab.userdata")
+            kaggle_username = userdata.get('KAGGLE_USERNAME')
+            kaggle_key = userdata.get('KAGGLE_KEY')
+            if kaggle_username and kaggle_key:
+                os.environ['KAGGLE_USERNAME'] = kaggle_username
+                os.environ['KAGGLE_KEY'] = kaggle_key
+                print("[COLAB] Authenticated using Colab Secrets.")
     except Exception:
         pass
 
@@ -98,3 +101,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

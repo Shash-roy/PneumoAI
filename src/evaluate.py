@@ -267,3 +267,4 @@ def print_comparison_table(
     print(f"{'True Negatives (TN)':<25} | {default_metrics['tn']:>21} | {optimal_metrics['tn']:>21}")
     print(f"{'False Positives (FP)':<25} | {default_metrics['fp']:>21} | {optimal_metrics['fp']:>21}")
     print("=" * 80)
+

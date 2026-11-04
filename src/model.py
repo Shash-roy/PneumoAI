@@ -97,3 +97,4 @@ def get_parameter_summary(model: nn.Module) -> Dict[str, int]:
         "trainable": trainable_params,
         "frozen": frozen_params
     }
+
