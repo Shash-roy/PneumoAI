@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# Kaggle credentials and secrets - NEVER COMMIT!
+kaggle.json
+.kaggle/
+*.key
+*.pem
+.env
+
+# Datasets and image caches
+data/
+chest_xray/
+chest-xray-pneumonia/
+*.zip
+*.tar.gz
+
+# Trained model weights and checkpoints (can be large)
+*.pt
+*.pth
+checkpoints/
+best_model_*.pth
+baseline_model.pth
+fine_tuned_model.pth
+
+# Outputs and logs
+outputs/
+logs/
+runs/
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
