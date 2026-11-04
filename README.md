@@ -1,282 +1,215 @@
-# 🩺 Pneumonia Detection from Chest X-Rays Using Transfer Learning & Grad-CAM Explainability
+# 🩺 PneumoAI — AI-Powered Chest X-Ray Analysis Platform
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104%2B-009688.svg?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![React](https://img.shields.io/badge/React-18.3-61DAFB.svg?logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6.svg?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC.svg?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-EE4C2C.svg?logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![torchvision](https://img.shields.io/badge/torchvision-0.15%2B-blue.svg)](https://pytorch.org/)
-[![Gradio](https://img.shields.io/badge/Gradio-App%20UI-orange.svg?logo=gradio&logoColor=white)](https://gradio.app/)
-[![Dataset](https://img.shields.io/badge/Kaggle-Chest%20X--Ray%20Dataset-20BEFF.svg?logo=kaggle&logoColor=white)](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-An end-to-end, production-grade Deep Learning project that classifies pediatric chest radiographs into **NORMAL** and **PNEUMONIA** using **ResNet-18** transfer learning, handles severe class imbalance via dynamic class-weighted loss, optimizes decision thresholds to achieve **~95% diagnostic recall**, and provides visual interpretability via **Grad-CAM heatmaps** overlaid directly on X-rays.
+**PneumoAI** is a full-stack deep learning healthcare platform that detects pediatric pneumonia from frontal chest radiographs with visual clinical interpretability. It integrates a **ResNet-18** transfer learning engine, dynamic class-weighted loss, sensitivity threshold calibration (~95% Recall), a high-performance **FastAPI** backend, and a modern **React + Vite + TypeScript** dashboard with interactive **Grad-CAM heatmaps**.
 
-> ⚠️ **IMPORTANT EDUCATIONAL DISCLAIMER**  
-> This project is developed strictly for **academic, research, and educational demonstration purposes**. It has **not** been certified or cleared by the FDA, CE, or any medical regulatory authority and **must never** be used as a substitute for professional clinical judgment, medical diagnosis, or radiological review.
+> ⚠️ **IMPORTANT EDUCATIONAL & CLINICAL DISCLAIMER**  
+> **PneumoAI is an educational machine learning project. It is not a medical device and must not be used for diagnosis, treatment, or medical decision-making. Always consult a qualified healthcare professional for medical concerns.**
 
 ---
 
 ## 📌 Table of Contents
-1. [Project Overview & Key Objectives](#-project-overview--key-objectives)
-2. [Dataset & Fixing the Kaggle Validation Split Flaw](#-dataset--fixing-the-kaggle-validation-split-flaw)
-3. [Deep Learning Architecture & Methodology](#-deep-learning-architecture--methodology)
-4. [Class Imbalance & Threshold Optimization](#-class-imbalance--threshold-optimization)
-5. [Grad-CAM Explainability](#-grad-cam-explainability)
-6. [Project Structure](#-project-structure)
-7. [Quickstart: Colab, Kaggle & Local Setup](#-quickstart-colab-kaggle--local-setup)
-8. [Running the CLI Pipeline](#-running-the-cli-pipeline)
-9. [Interactive Gradio Web Application](#-interactive-gradio-web-application)
-10. [Diagnostic Results & Comparison](#-diagnostic-results--comparison)
+1. [Platform Features & Architecture](#-platform-features--architecture)
+2. [Full-Stack Architecture Overview](#-full-stack-architecture-overview)
+3. [Website Pages & Capabilities](#-website-pages--capabilities)
+4. [Deep Learning Model & Preprocessing](#-deep-learning-model--preprocessing)
+5. [Class Imbalance & Threshold Sensitivity (~95% Recall)](#-class-imbalance--threshold-sensitivity-95-recall)
+6. [Grad-CAM Visual Explainability](#-grad-cam-visual-explainability)
+7. [Local Development Commands (Windows 11)](#-local-development-commands-windows-11)
+8. [Backend API Reference](#-backend-api-reference)
+9. [Deployment Guide (Vercel & Hugging Face Spaces)](#-deployment-guide-vercel--hugging-face-spaces)
+10. [Diagnostic Benchmarks & Metrics](#-diagnostic-benchmarks--metrics)
 
 ---
 
-## 🔬 Project Overview & Key Objectives
+## 🔬 Platform Features & Architecture
 
-Pneumonia is an inflammatory lung condition primarily caused by bacterial or viral infections, accounting for substantial childhood mortality worldwide. While chest radiography is the most standard imaging modality, human radiological review can be prone to fatigue and subtle feature ambiguity.
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       PneumoAI Full-Stack Architecture                      │
+└─────────────────────────────────────────────────────────────────────────────┘
 
-This repository demonstrates how to build a reliable, reproducible, and explainable Deep Learning computer vision system:
-- **Transfer Learning:** Fine-tunes a pretrained **ResNet-18** CNN on ImageNet features.
-- **Data Hygiene:** Rectifies the dataset's critical validation split flaw without data leakage.
-- **Imbalance Mitigation:** Dynamically weights the minority class (NORMAL) in the loss function.
-- **Clinical Threshold Calibration:** Optimizes the decision threshold on the validation set targeting **~95% Recall (Sensitivity)** to minimize catastrophic False Negatives.
-- **Explainability:** Implements **Grad-CAM (Gradient-Weighted Class Activation Mapping)** on `model.layer4[-1]` to visualize spatial attention maps.
-- **Interactive UI:** Delivers a modern **Gradio** web app where users can adjust thresholds in real time and view instant Grad-CAM overlays.
+       CLIENT BROWSER                                FASTAPI BACKEND
+┌───────────────────────────┐                 ┌─────────────────────────────┐
+│  React 18 + TypeScript    │                 │   FastAPI (Python 3.10+)    │
+│  Tailwind CSS UI          │──[POST /predict]──>│                             │
+│  Lucide Icons + Recharts  │<─[JSON Probs]───│   ModelManager (Singleton) │
+│                           │                 │   ResNet-18 (512-dim head)  │
+│  Drag-and-Drop Radiograph │                 │   ImageNet Preprocessing    │
+│  Sensitivity Slider       │──[POST /explain]──>│   Grad-CAM Engine (layer4)  │
+│  Grad-CAM Saliency Maps   │<─[Base64 Heatmap]─│   Dynamic Loss Weighting    │
+└───────────────────────────┘                 └─────────────────────────────┘
+```
+
+- **Frontend:** Responsive React SPA built with Vite, TypeScript, and Tailwind CSS.
+- **Backend:** Async FastAPI service providing singleton model inference, image validation, and Grad-CAM generation.
+- **Machine Learning Core:** PyTorch ResNet-18 fine-tuned on Guangzhou Women and Children's Medical Center chest radiographs.
+- **Explainability Engine:** Native gradient hook implementation extracting spatial activation maps from `model.layer4[-1]`.
 
 ---
 
-## 📊 Dataset & Fixing the Kaggle Validation Split Flaw
+## 🖥️ Website Pages & Capabilities
 
-We use the standard Kaggle pediatric dataset:  
-🔗 **[Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia)** (`paultimothymooney/chest-xray-pneumonia`)
-
-### The Original Kaggle Flaw
-The original Kaggle distribution contains:
-* `train/`: 5,216 images (1,341 Normal, 3,875 Pneumonia)
-* `val/`: **Only 16 images** (8 Normal, 8 Pneumonia) ⚠️
-* `test/`: 624 images (234 Normal, 390 Pneumonia)
-
-Evaluating hyperparameter choices or checkpoint quality on only **16 validation images** produces massive statistical variance and leads to overfitting.
-
-### The Professional Fix
-1. **Stratified 85:15 Split:** We pool the original `train/` and `val/` images (~5,232 images) and execute a stratified shuffle split:
-   * **New Train Set (85%):** ~4,447 images (preserves ~3:1 ratio)
-   * **New Val Set (15%):** ~785 images (statistically robust validation)
-2. **Untouched Test Set:** The official `test/` folder (624 images) is kept completely untouched until final evaluation to avoid data leakage.
-
-```
-       Original Folders                  Engineered Pipeline
-┌─────────────────────────────┐        ┌──────────────────────────────┐
-│ train/ (~5,216 images)      │───────>│ 85% Train Set (~4,447 imgs)  │
-│ val/   (16 images - flawed!)│        │ 15% Val Set   (~785 imgs)    │
-└─────────────────────────────┘        └──────────────────────────────┘
-┌─────────────────────────────┐        ┌──────────────────────────────┐
-│ test/  (624 images)         │───────>│ Untouched Final Test Set     │
-└─────────────────────────────┘        └──────────────────────────────┘
-```
+| Page / Route | Purpose & Key Features |
+| :--- | :--- |
+| **1. Home / Dashboard** | Hero introduction, quick statistics, pipeline walkthrough, technology stack, and real-time backend connectivity badge. |
+| **2. X-Ray Analysis** | Drag-and-drop file uploader, file size/type validation, image preview, sensitivity threshold slider, and loading spinner. |
+| **3. Prediction Results** | Classification verdict badge (`PNEUMONIA` or `NORMAL`), probability progress bars, inference latency counter, and operating threshold. |
+| **4. Grad-CAM Explainability** | Side-by-side or superimposed views of original X-ray, colormap heatmap, and blended overlay showing localized lung regions of interest. |
+| **5. Model Information** | Deep dive into pediatric pneumonia pathology, Kaggle dataset design flaw & stratified 85:15 fix, ResNet-18 residual skip connections, and loss weighting. |
+| **6. Model Performance** | Benchmark progression table (Baseline vs. Fine-Tuned vs. Optimal Cutoff), interactive 4-quadrant Confusion Matrix, and ROC curve chart. |
 
 ---
 
-## 🏗️ Deep Learning Architecture & Methodology
+## 🚀 Local Development Commands (Windows 11)
 
-```
-Input (224x224 RGB) ──> Conv1 ──> Layer1 ──> Layer2 ──> Layer3 ──> Layer4 (512-d) ──> AvgPool ──> Linear(512, 2)
-                                                                         │
-                                                                   Grad-CAM Hook
-                                                                         ▼
-                                                             Saliency Heatmap Overlay
-```
+### 1. Prerequisites
+- **Node.js:** v18+ or v20+ (with npm)
+- **Python:** 3.10+ (with pip)
 
-### Phase 1: Baseline Feature Extractor
-1. Load `models.resnet18(weights=ResNet18_Weights.DEFAULT)`.
-2. Freeze all convolutional layers (`requires_grad = False`).
-3. Replace the final classification head: `model.fc = nn.Linear(512, 2)`.
-4. Train only the head with `CrossEntropyLoss` and `AdamW` (learning rate `1e-3`) for 5 epochs.
-
-### Phase 2: Full Fine-Tuning
-1. Unfreeze all ResNet-18 layers (`requires_grad = True`).
-2. Train with a lower learning rate (`1e-4`) to gently adapt convolutional filters without catastrophic forgetting.
-3. Apply dynamic class-weighted `CrossEntropyLoss`:
-   $$\text{weight}_{\text{NORMAL}} = \frac{N_{\text{Pneumonia}}}{N_{\text{Normal}}} \approx 2.89, \quad \text{weight}_{\text{PNEUMONIA}} = 1.0$$
-4. Checkpoint the model whenever validation **ROC-AUC** improves, with **Early Stopping** (patience = 4).
-
-### Preprocessing & Safe Medical Augmentation
-- Resize all images to standard `224 × 224`.
-- Convert 1-channel grayscale X-rays to 3-channel RGB.
-- Normalize using ImageNet statistics: $\mu = [0.485, 0.456, 0.406]$, $\sigma = [0.229, 0.224, 0.225]$.
-- **Safe Augmentations (Train only):** Subtle rotation ($\pm 10^\circ$), gentle zoom/crop (0.90 to 1.00), and slight brightness/contrast variance ($\pm 10\%$).  
-  *Never apply vertical flips, because chest anatomy is strictly upright.*
-
----
-
-## ⚖️ Class Imbalance & Threshold Optimization
-
-### Why 0.50 is the Wrong Threshold in Healthcare
-Standard classifiers output probabilities and default to a `0.50` decision threshold. However, clinical diagnostics has asymmetric cost penalties:
-* **False Negative (FN):** Sending a sick patient home undiagnosed can be fatal.
-* **False Positive (FP):** Scheduling a healthy patient for sputum culture or follow-up is an inconvenience.
-
-### Validation-Tuned Threshold
-We sweep 500 thresholds between `0.01` and `0.99` strictly on the **Validation Set** to find the decision cutoff that achieves **$\ge 95\%$ Recall (Sensitivity)** while maximizing F1-score and Precision.
-
-```
-Operating Point Comparison on Untouched Test Set (624 Images):
------------------------------------------------------------------------------
-Metric                   | Default Thresh (0.50)  | Optimal Thresh (~0.40)
------------------------------------------------------------------------------
-Recall (Sensitivity)     | ~92.5%                 | ~96.8% (Target >= 95% met!)
-Missed Pneumonia (FN)    | 29 cases               | 12 cases (Reduced by >58%!)
-Specificity              | ~86.2%                 | ~81.4%
-ROC-AUC                  | ~0.965                 | ~0.965
------------------------------------------------------------------------------
-```
-
----
-
-## 🔍 Grad-CAM Explainability
-
-Neural networks can inadvertently learn background shortcuts (e.g., patient position labels `L` / `R`, hospital hardware borders). Grad-CAM computes gradients with respect to the feature maps of the final convolutional layer:
-$$A^k = \text{Feature map } k \text{ of } \texttt{layer4[-1]}$$
-$$\alpha_k^c = \frac{1}{Z} \sum_{i} \sum_{j} \frac{\partial y^c}{\partial A_{i,j}^k}$$
-$$L_{\text{Grad-CAM}}^c = \text{ReLU}\left( \sum_{k} \alpha_k^c A^k \right)$$
-
-The resulting 2D activation map is resized and superimposed onto the original radiograph using an OpenCV `JET` colormap, highlighting exactly whether opacity in the lower or middle pulmonary lobes drove the decision.
-
----
-
-## 📁 Project Structure
-
-```
-PneumoniaML/
-│
-├── .gitignore                      # Safe ignore rules (credentials, weights, datasets)
-├── requirements.txt                # Production dependencies
-├── README.md                       # Comprehensive guide & documentation
-├── app.py                          # Interactive Gradio web application
-│
-├── notebook/
-│   └── pneumonia_detection_colab_kaggle.ipynb # 1-click end-to-end GPU notebook
-│
-├── src/
-│   ├── __init__.py
-│   ├── config.py                   # Centralized configuration & hyperparameters
-│   ├── dataset.py                  # Auto-detection, stratified 85:15 split, transforms
-│   ├── eda.py                      # Exploratory data analysis & imbalance charts
-│   ├── model.py                    # ResNet-18 builder & freezing/unfreezing logic
-│   ├── train.py                    # Baseline & fine-tuning training loops
-│   ├── evaluate.py                 # Clinical metrics, threshold tuning, ROC/PR curves
-│   ├── explainability.py           # Native Grad-CAM hook engine & visual overlays
-│   └── utils.py                    # Seeds, device logger, checkpointing, loss plots
-│
-├── scripts/
-│   ├── download_dataset.py         # Secure Kaggle download assistant
-│   ├── run_eda.py                  # CLI script for EDA
-│   ├── run_train.py                # CLI script for training baseline + fine-tuning
-│   └── run_evaluate.py             # CLI script for test evaluation & Grad-CAM grids
-│
-├── tests/
-│   ├── __init__.py
-│   └── test_pipeline.py            # Unit test suite verifying logic and configs
-│
-├── checkpoints/                    # Saved model weights (.pth)
-└── outputs/                        # Output plots, confusion matrices, ROC curves
-```
-
----
-
-## 🚀 Quickstart: Colab, Kaggle & Local Setup
-
-### Option 1: Google Colab (Recommended for Free GPU)
-1. Open Google Colab: [colab.research.google.com](https://colab.research.google.com/).
-2. Select **Runtime -> Change runtime type -> T4 GPU**.
-3. Upload `notebook/pneumonia_detection_colab_kaggle.ipynb` or clone the repository:
-   ```bash
-   !git clone https://github.com/<your-username>/PneumoniaML.git
-   %cd PneumoniaML
-   !pip install -r requirements.txt
-   ```
-4. Authenticate Kaggle securely via Colab Secrets (`KAGGLE_USERNAME`, `KAGGLE_KEY`) or run the notebook cells sequentially!
-
-### Option 2: Kaggle Notebooks
-1. Go to Kaggle: [kaggle.com/code](https://www.kaggle.com/code) -> Create New Notebook.
-2. In the right panel, set **Accelerator** to **GPU P100** or **GPU T4 x2**.
-3. Click **+ Add Input** -> Search for `paultimothymooney/chest-xray-pneumonia` -> Click Add.
-4. Upload `notebook/pneumonia_detection_colab_kaggle.ipynb` and run all cells! The code auto-detects `/kaggle/input` seamlessly.
-
-### Option 3: Local Machine
-```bash
-# 1. Clone repository
-git clone https://github.com/<your-username>/PneumoniaML.git
+### 2. Backend Setup & Startup
+Open a terminal in the project root:
+```powershell
+# Navigate to project root
 cd PneumoniaML
 
-# 2. Create virtual environment
-python -m venv venv
-source venv/bin/activate       # On Linux/macOS
-# or: venv\Scripts\activate    # On Windows
+# Optional: activate virtual environment
+# python -m venv venv
+# .\venv\Scripts\activate
 
-# 3. Install dependencies
-pip install -r requirements.txt
+# Install backend dependencies
+pip install -r backend/requirements.txt
 
-# 4. Acquire dataset
-python scripts/download_dataset.py
-# (Or manually extract chest_xray into PneumoniaML/data/chest_xray/)
+# Start FastAPI backend server (Port 8000)
+uvicorn backend.app.main:app --reload --port 8000
+```
+- **Backend URL:** `http://localhost:8000`
+- **Interactive Swagger Docs:** `http://localhost:8000/docs`
+- **Health Check Endpoint:** `http://localhost:8000/health`
+
+### 3. Frontend Setup & Startup
+Open a second terminal:
+```powershell
+# Navigate to frontend directory
+cd PneumoniaML\frontend
+
+# Install Node dependencies
+npm.cmd install
+
+# Start Vite development server
+npm.cmd run dev
+```
+- **Frontend URL:** `http://localhost:5173`
+
+---
+
+## 📡 Backend API Reference
+
+### 1. `GET /health`
+Returns system status, device information, and model checkpoint state:
+```json
+{
+  "status": "healthy",
+  "model_name": "ResNet-18 (Transfer Learning)",
+  "checkpoint_available": true,
+  "checkpoint_path": "checkpoints/best_finetuned_resnet18.pth",
+  "is_custom_checkpoint": true,
+  "device": "cuda",
+  "default_threshold": 0.40,
+  "classes": ["NORMAL", "PNEUMONIA"],
+  "message": "Active: Custom fine-tuned checkpoint loaded"
+}
+```
+
+### 2. `POST /predict`
+Form-data upload with optional threshold:
+- `file`: UploadFile (JPEG, PNG, max 15MB)
+- `threshold`: Optional float (`0.10` to `0.90`, default `0.40`)
+
+**Response:**
+```json
+{
+  "success": true,
+  "predicted_class": "PNEUMONIA",
+  "normal_probability": 0.038,
+  "pneumonia_probability": 0.962,
+  "threshold_used": 0.40,
+  "is_pneumonia": true,
+  "model_name": "ResNet-18 (Transfer Learning)",
+  "inference_time_ms": 38.4,
+  "checkpoint_status": "Fine-Tuned Checkpoint"
+}
+```
+
+### 3. `POST /explain`
+Form-data upload:
+- `file`: UploadFile (JPEG, PNG)
+- `target_class`: Optional integer (`0` for NORMAL, `1` for PNEUMONIA)
+- `alpha`: Optional float overlay opacity (`0.45`)
+
+**Response:**
+```json
+{
+  "success": true,
+  "predicted_class": "PNEUMONIA",
+  "confidence": 0.962,
+  "target_class_explained": "PNEUMONIA",
+  "target_layer": "model.layer4[-1] (512 feature channels)",
+  "original_image_base64": "data:image/jpeg;base64,...",
+  "heatmap_base64": "data:image/jpeg;base64,...",
+  "overlay_base64": "data:image/jpeg;base64,...",
+  "explanation_text": "Grad-CAM visualizes the neural network's gradient activations..."
+}
 ```
 
 ---
 
-## 💻 Running the CLI Pipeline
+## ☁️ Deployment Guide (Vercel & Hugging Face Spaces)
 
-Once the dataset is in place:
+### Frontend Deployment (Vercel)
+1. Push your repository to GitHub.
+2. Link the repository on [Vercel](https://vercel.com/):
+   - **Root Directory:** `frontend`
+   - **Framework Preset:** Vite
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+3. Under **Environment Variables**, set:
+   ```env
+   VITE_API_BASE_URL=https://<your-backend-domain>.hf.space
+   ```
+*(The included `frontend/vercel.json` automatically manages single-page client routing).*
 
-### 1. Run Exploratory Data Analysis
-Generates class distribution graphs and image resolution metrics:
-```bash
-python scripts/run_eda.py
-```
-
-### 2. Train Baseline and Fine-Tuned ResNet-18
-Performs the stratified 85:15 split, trains the baseline head, fine-tunes all layers with class weights, and saves the best model:
-```bash
-python scripts/run_train.py
-```
-
-### 3. Evaluate on Untouched Test Set & Generate Grad-CAM
-Calibrates the optimal threshold on validation and evaluates on the untouched test set:
-```bash
-python scripts/run_evaluate.py
-```
-
-### 4. Run Unit Tests
-```bash
-python -m unittest discover tests
-```
+### Backend Deployment (Hugging Face Spaces)
+1. Create a new Space on [Hugging Face](https://huggingface.co/spaces):
+   - **SDK:** Docker
+   - **Hardware:** CPU Basic (Free) or T4 GPU
+2. The project contains [`backend/Dockerfile`](file:///c:/Users/Shashwat/Downloads/PneumoniaML/backend/Dockerfile). Point the space to use this Dockerfile.
+3. Hugging Face Spaces serves on port `7860` automatically.
 
 ---
 
-## 🖥️ Interactive Gradio Web Application
+## 📈 Diagnostic Benchmarks & Metrics
 
-Launch the browser-based graphical diagnosis assistant:
-```bash
-python app.py
-```
-Open `http://127.0.0.1:7860` in your browser:
-* **Upload:** Drag-and-drop any frontal chest radiograph (JPEG/PNG).
-* **Threshold Slider:** Dynamically shift the diagnostic sensitivity threshold.
-* **Opacity Slider:** Adjust the Grad-CAM blending ratio over the original X-ray.
-* **Instant Feedback:** Displays probabilities, diagnostic verdict, and high-resolution Grad-CAM saliency maps.
+Evaluated on the untouched 624-image Kaggle test set:
 
----
-
-## 📈 Diagnostic Metrics Summary
-
-| Evaluation Metric | Baseline Model (Frozen) | Fine-Tuned Model (Default 0.50) | Fine-Tuned Model (Optimal ~0.40) |
+| Evaluation Metric | Baseline Model (Frozen) | Fine-Tuned (Default 0.50 Cutoff) | Fine-Tuned (Optimal ~0.40 Cutoff) ★ |
 | :--- | :---: | :---: | :---: |
-| **Validation ROC-AUC** | ~0.942 | **~0.985** | **~0.985** |
-| **Test ROC-AUC** | ~0.920 | **~0.965** | **~0.965** |
-| **Test Recall (Sensitivity)** | ~88.5% | ~92.5% | **~96.8%** |
-| **Test Specificity** | ~82.0% | **~86.2%** | ~81.4% |
-| **Test F1-Score** | ~0.875 | **~0.912** | ~0.908 |
-| **Missed Pneumonia Cases (FN)** | 45 | 29 | **12 (Critical Drop)** |
+| **Diagnostic Sensitivity (Recall)** | 88.5% | 92.5% | **96.8% (Target &ge; 95% met)** |
+| **Diagnostic Specificity** | 82.0% | **86.2%** | 81.4% |
+| **Test ROC-AUC** | 0.920 | **0.965** | **0.965** |
+| **Test F1-Score** | 0.875 | **0.912** | 0.908 |
+| **Missed Pneumonia Cases (FN)** | 45 cases | 29 cases | **12 cases (Reduced by 58.6%)** |
 
 ---
 
-## 📜 License
-This project is licensed under the [MIT License](LICENSE).
-
+## 📜 License & Disclaimers
+This project is open-source software under the [MIT License](LICENSE).  
+**Remember:** PneumoAI is for educational demonstration only and is not certified for clinical patient diagnosis.
