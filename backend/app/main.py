@@ -12,9 +12,12 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+try:
+    from fastapi import FastAPI, File, Form, HTTPException, UploadFile, status  # type: ignore
+    from fastapi.middleware.cors import CORSMiddleware  # type: ignore
+    from fastapi.responses import JSONResponse  # type: ignore
+except ImportError:
+    pass
 
 # Add project root to sys.path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -217,3 +220,4 @@ def get_performance_stats():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("backend.app.main:app", host="127.0.0.1", port=8000, reload=True)
+

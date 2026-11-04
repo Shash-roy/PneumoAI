@@ -58,3 +58,4 @@ class ModelPerformanceStats(BaseModel):
     target_recall: float
     test_set_size: int
     confusion_matrix: Optional[Dict[str, int]] = None
+

@@ -10,9 +10,14 @@ import sys
 from pathlib import Path
 from typing import Optional, Tuple
 
-import torch
-import torch.nn as nn
-from torchvision import models
+try:
+    import torch  # type: ignore
+    import torch.nn as nn  # type: ignore
+    from torchvision import models  # type: ignore
+except ImportError:
+    torch = None
+    nn = None
+    models = None
 
 # Add project root to sys.path so we can import from existing src/
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -129,3 +134,4 @@ class ModelManager:
 
 # Global accessor
 model_manager = ModelManager()
+

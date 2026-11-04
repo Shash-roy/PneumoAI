@@ -149,3 +149,4 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPage, onNavigate, health 
     </header>
   );
 };
+

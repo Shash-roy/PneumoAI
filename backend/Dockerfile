@@ -31,3 +31,4 @@ EXPOSE 7860
 
 # Run FastAPI backend with Uvicorn
 CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "7860"]
+

@@ -9,12 +9,19 @@ import base64
 import io
 from typing import Dict, Optional, Tuple
 
-import cv2
-import numpy as np
-import torch
-import torch.nn as nn
-from PIL import Image
-from torchvision import transforms
+try:
+    import cv2  # type: ignore
+except ImportError:
+    cv2 = None
+
+try:
+    import numpy as np  # type: ignore
+    import torch  # type: ignore
+    import torch.nn as nn  # type: ignore
+    from PIL import Image  # type: ignore
+    from torchvision import transforms  # type: ignore
+except ImportError:
+    pass
 
 from backend.app.model_loader import model_manager
 
@@ -111,6 +118,12 @@ def generate_gradcam_explanation(
     """
     High-level generator returning original, heatmap, and overlay images as base64 strings.
     """
+    if cv2 is None:
+        raise ImportError(
+            "[ERROR] opencv-python (cv2) is not installed in the active Python environment!\n"
+            "Please run: pip install -r backend/requirements.txt"
+        )
+
     model, device = model_manager.get_model()
 
     # Standardize image to 224x224 RGB
@@ -167,3 +180,4 @@ def generate_gradcam_explanation(
             "It must not be used as an independent diagnostic test."
         )
     }
+

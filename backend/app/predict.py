@@ -12,9 +12,14 @@ import io
 import time
 from typing import Dict, Tuple
 
-import torch
-from PIL import Image
-from torchvision import transforms
+try:
+    import torch  # type: ignore
+    from PIL import Image  # type: ignore
+    from torchvision import transforms  # type: ignore
+except ImportError:
+    torch = None
+    Image = None
+    transforms = None
 
 from backend.app.model_loader import model_manager
 
@@ -113,3 +118,4 @@ def run_prediction(
             "Always consult a qualified healthcare professional for medical concerns."
         )
     }
+
