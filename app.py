@@ -13,10 +13,17 @@ Allows clinicians, researchers, and students to:
 from pathlib import Path
 from typing import Dict, Tuple
 
-import gradio as gr
-import numpy as np
-import torch
-from PIL import Image
+try:
+    import gradio as gr  # type: ignore
+except ImportError:
+    gr = None
+
+try:
+    import numpy as np  # type: ignore
+    import torch  # type: ignore
+    from PIL import Image  # type: ignore
+except ImportError:
+    pass
 
 from src.config import config
 from src.explainability import explain_image
@@ -152,8 +159,16 @@ def predict_and_explain(
 # ------------------------------------------------------------------------------
 # Gradio UI Layout
 # ------------------------------------------------------------------------------
-def create_app() -> gr.Blocks:
+def create_app() -> "gr.Blocks":
     """Builds the complete Gradio interface with responsive components."""
+    if gr is None:
+        raise ImportError(
+            "\n" + "=" * 70 + "\n"
+            "[ERROR] Gradio is not installed in the active Python environment!\n"
+            "To install all required dependencies, run:\n"
+            "    pip install -r requirements.txt\n"
+            "=" * 70
+        )
     
     custom_css = """
     .gradio-container { font-family: 'Helvetica Neue', Arial, sans-serif; }
