@@ -22,8 +22,9 @@ try:
     import numpy as np  # type: ignore
     import torch  # type: ignore
     from PIL import Image  # type: ignore
+    from torchvision import transforms  # type: ignore
 except ImportError:
-    pass
+    transforms = None
 
 from src.config import config
 from src.explainability import explain_image
@@ -110,7 +111,8 @@ def predict_and_explain(
     )
 
     # Re-compute exact softmax probabilities for both classes
-    from torchvision import transforms
+    if transforms is None:
+        return {}, None, None, "PyTorch / torchvision is not installed in the active environment."
     preprocess = transforms.Compose([
         transforms.Resize(config.IMAGE_SIZE),
         transforms.ToTensor(),
