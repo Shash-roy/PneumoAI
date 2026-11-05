@@ -11,12 +11,12 @@
 
 **PneumoAI** is a full-stack deep learning healthcare platform that detects pediatric pneumonia from frontal chest radiographs with visual clinical interpretability. It integrates a **ResNet-18** transfer learning engine, dynamic class-weighted loss, sensitivity threshold calibration (~95% Recall), a high-performance **FastAPI** backend, and a modern **React + Vite + TypeScript** dashboard with interactive **Grad-CAM heatmaps**.
 
-> ⚠️ **IMPORTANT EDUCATIONAL & CLINICAL DISCLAIMER**  
+>  **IMPORTANT EDUCATIONAL & CLINICAL DISCLAIMER**  
 > **PneumoAI is an educational machine learning project. It is not a medical device and must not be used for diagnosis, treatment, or medical decision-making. Always consult a qualified healthcare professional for medical concerns.**
 
 ---
 
-## 📌 Table of Contents
+##  Table of Contents
 1. [Platform Features & Architecture](#-platform-features--architecture)
 2. [Full-Stack Architecture Overview](#-full-stack-architecture-overview)
 3. [Website Pages & Capabilities](#-website-pages--capabilities)
@@ -30,7 +30,7 @@
 
 ---
 
-## 🔬 Platform Features & Architecture
+##  Platform Features & Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -56,7 +56,7 @@
 
 ---
 
-## 🖥️ Website Pages & Capabilities
+##  Website Pages & Capabilities
 
 | Page / Route | Purpose & Key Features |
 | :--- | :--- |
@@ -69,7 +69,7 @@
 
 ---
 
-## 🚀 Local Development Commands (Windows 11)
+##  Local Development Commands (Windows 11)
 
 ### 1. Prerequisites
 - **Node.js:** v18+ or v20+ (with npm)
@@ -172,7 +172,7 @@ Form-data upload:
 
 ---
 
-## ☁️ Deployment Guide (Vercel & Hugging Face Spaces)
+##  Deployment Guide (Vercel & Hugging Face Spaces)
 
 ### Frontend Deployment (Vercel)
 1. Push your repository to GitHub.
@@ -196,7 +196,7 @@ Form-data upload:
 
 ---
 
-## 📈 Diagnostic Benchmarks & Metrics
+##  Diagnostic Benchmarks & Metrics
 
 Evaluated on the untouched 624-image Kaggle test set:
 
@@ -210,6 +210,6 @@ Evaluated on the untouched 624-image Kaggle test set:
 
 ---
 
-## 📜 License & Disclaimers
+##  License & Disclaimers
 This project is open-source software under the [MIT License](LICENSE).  
 **Remember:** PneumoAI is for educational demonstration only and is not certified for clinical patient diagnosis.
